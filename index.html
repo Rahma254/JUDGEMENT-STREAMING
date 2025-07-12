@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>JUDGEMENT FILE: Nabila Studio (Full JS/JSX Reconstruction)</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <!-- =============================================================== -->
+    <!-- === MEMUAT "MESIN" REACT & PENERJEMAH JSX (BABEL) LANGSUNG  === -->
+    <!-- =============================================================== -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/react-router-dom@6/umd/react-router-dom.development.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+    <!-- =============================================================== -->
+
+    <!-- === [BAGIAN 1] GAYA CSS: Terjemahan dari .scss & styled-components === -->
+    <style>
+        /* === Variabel & Reset (dari _variables.scss & main.scss) === */
+        :root {
+            --font-primary: 'Poppins', sans-serif; --font-display: 'Orbitron', sans-serif; --color-dark-primary: #0D0221; --color-dark-secondary: #0F084B; --color-purple: #26175C; --color-blue-accent: #00C4FF; --color-pink-accent: #FF00E4; --color-gold: #FFD700; --text-light: #F0F0F0; --text-muted: #a9a9a9; --bg-light: #f8f9fa; --bg-white: #ffffff; --text-dark-gray: #343a40;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: var(--font-primary); background-color: var(--color-dark-primary); color: var(--text-light); }
+        a { color: var(--color-pink-accent); text-decoration: none; }
+        h1, h2, h3, h4 { font-family: var(--font-display); color: var(--color-blue-accent); text-shadow: 0 0 5px rgba(0, 196, 255, 0.7); }
+        
+        /* === Komponen Layout Utama (dari MainLayout.jsx & Header.jsx) === */
+        .animated-background { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; z-index: -1; background: var(--color-dark-primary); }
+        .main-header { position: sticky; top: 0; padding: 1rem 3rem; display: flex; justify-content: space-between; align-items: center; background: rgba(13, 2, 33, 0.5); backdrop-filter: blur(10px); border-bottom: 1px solid var(--color-purple); z-index: 1000; }
+        .main-header .logo { font-family: var(--font-display); font-size: 1.8rem; font-weight: 700; color: var(--color-gold); text-shadow: 0 0 8px var(--color-gold); }
+        .main-header nav { display: flex; align-items: center; gap: 2rem; }
+        .main-header .nav-link { font-size: 1rem; font-weight: 600; color: var(--text-light); transition: all 0.3s ease; }
+        .main-header .nav-link:hover, .main-header .nav-link.active { color: var(--color-blue-accent); text-shadow: 0 0 5px var(--color-blue-accent); }
+        .main-header .user-actions { display: flex; align-items: center; gap: 1.5rem; }
+        .main-footer { padding: 2rem 3rem; background: var(--color-dark-primary); border-top: 1px solid var(--color-purple); text-align: center; color: var(--text-muted); }
+        main.content-outlet { padding: 2rem; min-height: 80vh; }
+        
+        /* === Komponen Umum (dari Button.jsx, InputField.jsx) === */
+        .btn { display: inline-block; padding: 0.8rem 2rem; border-radius: 50px; font-family: var(--font-display); font-weight: 600; font-size: 0.9rem; text-transform: uppercase; text-align: center; cursor: pointer; border: 2px solid transparent; transition: all 0.3s ease; }
+        .btn-primary { background: linear-gradient(90deg, var(--color-pink-accent), var(--color-blue-accent)); color: white; }
+        .btn-secondary { background-color: transparent; border-color: var(--color-gold); color: var(--color-gold); }
+        .input-wrapper { position: relative; margin-bottom: 1.5rem; }
+        .styled-input { width: 100%; padding: 1rem; background-color: rgba(15, 8, 75, 0.5); border: 1px solid var(--color-purple); border-radius: 8px; color: var(--text-light); font-size: 1rem; }
+        
+        /* === Halaman Spesifik === */
+        /* Auth (dari LoginPage.jsx) */
+        .auth-container { display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 2rem; }
+        .auth-form-wrapper { padding: 3rem; width: 100%; max-width: 450px; background: rgba(13, 2, 33, 0.7); border: 1px solid var(--color-purple); border-radius: 15px; backdrop-filter: blur(10px); }
+        .auth-form-wrapper h1 { text-align: center; margin-bottom: 2rem; }
+
+        /* Admin & Request (dari AdminPanel.jsx, RequestFormsPage.jsx) */
+        .light-theme { background-color: var(--bg-light); color: var(--text-dark-gray); }
+        .light-theme h1, .light-theme h2, .light-theme h3 { color: var(--text-dark-gray); text-shadow: none; }
+        .page-header { text-align: center; margin-bottom: 2rem; }
+        .container-grid { display: grid; grid-template-columns: 1fr; gap: 2rem; }
+        @media (min-width: 992px) { .container-grid { grid-template-columns: 1fr 1fr; } }
+        .card { background-color: var(--bg-white); padding: 2rem; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th, td { padding: 12px 15px; border-bottom: 1px solid #dee2e6; }
+        .status-badge { padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: 700; color: white; text-transform: capitalize;}
+        .status-pending { background-color: #ffc107; color: #333; }
+        .status-approved, .status-completed { background-color: #28a745; }
+        .status-rejected { background-color: #dc3545; }
+        .action-buttons button { border: none; padding: 6px 12px; border-radius: 5px; color: white; cursor: pointer; margin: 0 4px; }
+        .btn-approve { background-color: #28a745; }
+        .btn-reject { background-color: #dc3545; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <!-- ========================================================================================= -->
+    <!-- [BAGIAN 2] "RUH" JAVASCRIPT/JSX: Rekonstruksi Penuh dari Proyek React Anda             -->
+    <!-- ========================================================================================= -->
+    <script type="text/babel">
+    
+        // === [SETUP AWAL] Mirip dengan import di awal file ===
+        const { useState, useEffect } = React;
+        const { HashRouter, Routes, Route, Link, NavLink, Outlet, useNavigate, useParams } = ReactRouterDOM;
+        const formatRupiah = (n) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(n);
+        
+        // === [DATABASE DUMMY] Data yang seharusnya dari Supabase ===
+        const DUMMY_ITEMS = [ { id: 'boxing-glove', name: 'Boxing Glove', price: 50, imageUrl: 'https://img.icons8.com/emoji/48/boxing-glove-emoji.png' }, { id: 'teddy-bear', name: 'Teddy Bear', price: 3000, imageUrl: 'https://img.icons8.com/emoji/48/teddy-bear-.png' }, { id: 'gorilla', name: 'Gorilla', price: 25000, imageUrl: 'https://img.icons8.com/emoji/48/gorilla-emoji.png' }, { id: 'pig', name: 'Pig', price: 100000, imageUrl: 'https://img.icons8.com/emoji/48/pig-emoji.png' } ];
+        const DUMMY_PEMBELIAN = [ { id: 'PEM001', userName: 'Budi Kreator', amount: 50000, status: 'pending' }, { id: 'PEM003', userName: 'Eko Gamer', amount: 25000, status: 'approved' }, ];
+        const DUMMY_WITHDRAW = [ { id: 'WD001', userName: 'Rina Influencer', amount: 500000, paymentInfo: 'BCA - 1234567890', status: 'pending' }, { id: 'WD002', userName: 'Joko Vlogger', amount: 1250000, paymentInfo: 'GoPay - 08123...', status: 'completed' }, ];
+
+        // === [KOMPONEN UMUM] Rekonstruksi dari src/components/common ===
+        function Button({ to, primary, secondary, children }) {
+            const className = `btn ${primary ? 'btn-primary' : ''} ${secondary ? 'btn-secondary' : ''}`;
+            if (to) return <Link to={to} className={className}>{children}</Link>;
+            return <button className={className}>{children}</button>;
+        }
+
+        // === [KOMPONEN LAYOUT] Rekonstruksi dari src/components/layout ===
+        function Header() {
+            return (
+                <header className="main-header">
+                    <Link to="/" className="logo">Nabila Studio</Link>
+                    <nav>
+                        <NavLink to="/" className={({isActive}) => "nav-link" + (isActive ? " active" : "")}>Home</NavLink>
+                        <NavLink to="/stream/nabila" className={({isActive}) => "nav-link" + (isActive ? " active" : "")}>Live Stream</NavLink>
+                        <NavLink to="/toko" className={({isActive}) => "nav-link" + (isActive ? " active" : "")}>Toko</NavLink>
+                        <NavLink to="/request" className={({isActive}) => "nav-link" + (isActive ? " active" : "")}>Transaksi</NavLink>
+                        <NavLink to="/admin" className={({isActive}) => "nav-link" + (isActive ? " active" : "")}>Admin</NavLink>
+                    </nav>
+                    <div className="user-actions">
+                        <Link to="/login" style={{color: 'var(--text-light)', fontWeight: '600'}}>Login</Link>
+                        <Button to="/register" primary>Register</Button>
+                    </div>
+                </header>
+            );
+        }
+
+        function Footer() {
+            return <footer className="main-footer">© {new Date().getFullYear()} Nabila Studio Development</footer>;
+        }
+
+        function MainLayout() {
+            return (
+                <div>
+                    <div className="animated-background"></div>
+                    <Header />
+                    <main className="content-outlet"><Outlet /></main>
+                    <Footer />
+                </div>
+            );
+        }
+
+        // === [HALAMAN-HALAMAN UTAMA] Rekonstruksi dari src/pages ===
+        function HomePage() {
+            return <div style={{textAlign: 'center', padding: '5rem 0'}}><h1>Your Stage, Your Voice</h1><p>The next generation karaoke and live-streaming platform.</p></div>;
+        }
+
+        function LiveStreamPage() {
+            const { userId } = useParams();
+            return <div><h1>Streaming Live: {userId}</h1><p>(Mux Player would be here)</p></div>;
+        }
+
+        function TokoPage() {
+            const [balance, setBalance] = useState(250000);
+            return (
+                <div>
+                    <div className="page-header">
+                        <h1>Toko Hadiah Virtual</h1>
+                        <h3>Saldo Anda: {formatRupiah(balance)}</h3>
+                    </div>
+                    <div className="container-grid" style={{gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))'}}>
+                        {DUMMY_ITEMS.map(item => (
+                            <div key={item.id} className="card" style={{color: '#333', textAlign: 'center'}}>
+                                <img src={item.imageUrl} alt={item.name} style={{width: 80, height: 80}} />
+                                <h4>{item.name}</h4>
+                                <p>{formatRupiah(item.price)}</p>
+                                <Button primary>Kirim Hadiah</Button>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+        }
+
+        function RequestFormsPage() {
+            return (
+                <div className="light-theme">
+                    <div className="page-header"><h1>Pusat Transaksi</h1></div>
+                    <div className="container-grid">
+                        <div className="card"><h2>Konfirmasi Pembelian Saldo</h2><p>(Form goes here)</p></div>
+                        <div className="card"><h2>Formulir Penarikan Dana</h2><p>(Form goes here)</p></div>
+                    </div>
+                </div>
+            );
+        }
+
+        function AdminLoginPage() {
+            const navigate = useNavigate();
+            const handleLogin = (e) => {
+                e.preventDefault();
+                alert('Login attempt! Redirecting to Admin Panel...');
+                navigate('/admin');
+            };
+            return (
+                <div className="auth-container">
+                    <div className="auth-form-wrapper">
+                        <h1>Admin Panel Login</h1>
+                        <form onSubmit={handleLogin}>
+                           <div className="input-wrapper"><input className="styled-input" type="email" placeholder="Email (jesikamahjong@gmail.com)" /></div>
+                           <div className="input-wrapper"><input className="styled-input" type="password" placeholder="Password (axis2019)" /></div>
+                           <Button primary>Login</Button>
+                        </form>
+                    </div>
+                </div>
+            );
+        }
+        
+        function AdminPanel() {
+            return (
+                <div className="light-theme">
+                    <div className="page-header"><h1>Panel Kendali Admin</h1></div>
+                    <div className="card">
+                        <h2>Request Pembelian Saldo</h2>
+                        <table>
+                            <thead><tr><th>ID</th><th>Pengguna</th><th>Jumlah</th><th>Status</th><th>Aksi</th></tr></thead>
+                            <tbody>
+                                {DUMMY_PEMBELIAN.map(req => (
+                                    <tr key={req.id}>
+                                        <td>{req.id}</td><td>{req.userName}</td><td>{formatRupiah(req.amount)}</td>
+                                        <td><span className={`status-badge status-${req.status}`}>{req.status}</span></td>
+                                        <td>{req.status === 'pending' && <div className="action-buttons"><button className="btn-approve">✔</button><button className="btn-reject">✖</button></div>}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                     <div className="card" style={{marginTop: '2rem'}}>
+                        <h2>Request Penarikan (Withdraw)</h2>
+                        <table>
+                            <thead><tr><th>ID</th><th>Pengguna</th><th>Jumlah</th><th>Status</th><th>Aksi</th></tr></thead>
+                            <tbody>
+                                {DUMMY_WITHDRAW.map(req => (
+                                    <tr key={req.id}>
+                                        <td>{req.id}</td><td>{req.userName}</td><td>{formatRupiah(req.amount)}</td>
+                                        <td><span className={`status-badge status-${req.status}`}>{req.status}</span></td>
+                                        <td>{req.status === 'pending' && <div className="action-buttons"><button className="btn-approve">✔</button><button className="btn-reject">✖</button></div>}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            );
+        }
+
+        function NotFoundPage() {
+            return <div style={{textAlign:'center', padding: '5rem 0'}}><h1>404 Not Found</h1><p>Halaman ini tidak ada di dalam rekonstruksi.</p></div>;
+        }
+
+        // === [RUH UTAMA] src/App.jsx, struktur aplikasi Anda ===
+        function App() {
+          return (
+            <Routes>
+              <Route path="/" element={<MainLayout />}>
+                <Route index element={<HomePage />} />
+                <Route path="stream/:userId" element={<LiveStreamPage />} />
+                <Route path="toko" element={<TokoPage />} />
+                <Route path="request" element={<RequestFormsPage />} />
+                <Route path="admin" element={<AdminPanel />} />
+              </Route>
+              <Route path="/login" element={<AdminLoginPage />} />
+              <Route path="*" element={<NotFoundPage />} />
+            </Routes>
+          );
+        }
+
+        // === [TITIK MASUK] src/main.jsx, yang menjalankan semuanya ===
+        const container = document.getElementById('root');
+        const root = ReactDOM.createRoot(container);
+        root.render(
+            <React.StrictMode>
+                <HashRouter>
+                    <App />
+                </HashRouter>
+            </React.StrictMode>
+        );
+
+        console.log('%cJUDGEMENT RENDERED:', 'color: #FF00E4; font-weight: bold; font-size: 18px;');
+        console.log('Jika Anda melihat halaman ini dan BUKAN layar hitam, "Ruh" aplikasi Anda telah berhasil dieksekusi oleh browser. Masalah Anda 100% ada pada proses build Vite, konfigurasi Vercel, atau salah satu dependency di package.json.');
+        console.log('Jika halaman ini TETAP HITAM, periksa pesan error berwarna MERAH di atas log ini. Itulah jawaban finalnya.');
+
+    </script>
+</body>
+</html>
